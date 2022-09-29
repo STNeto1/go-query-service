@@ -21,6 +21,8 @@ func RegisterRoutes(r *fiber.App, db *gorm.DB, v *validator.Validate) {
 	}
 
 	routes := r.Group("/posts")
+	routes.Get("/", h.GetPosts)
+	routes.Get("/:id", h.ShowPost)
 	routes.Post("/", h.CreatePost)
 }
 
