@@ -7,7 +7,7 @@ import (
 type Comment struct {
 	ID        uint      `json:"id" bson:"id"`
 	Comment   string    `json:"comment" bson:"comment"`
-	PostID    uint      `json:"-" bson:"post_id"`
+	PostID    uint      `json:"post_id,omitempty" bson:"post_id"`
 	CreatedAt time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
 }

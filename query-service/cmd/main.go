@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
 	"os"
-	"time"
 
+	"query-api/pkg/common/db"
 	"query-api/pkg/common/utils"
+	"query-api/pkg/posts"
 
-	"github.com/go-co-op/gocron"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 )
@@ -23,17 +23,23 @@ func main() {
 		}
 	}
 
-	// h := db.Connect()
-	// var v = validator.New()
-	s := gocron.NewScheduler(time.UTC)
+	h := db.Connect()
+	defer func() {
+		if err := h.Disconnect(context.TODO()); err != nil {
+			panic(err)
+		}
+	}()
+
+	// s := gocron.NewScheduler(time.UTC)
 
 	app := fiber.New()
+	posts.RegisterRoutes(app, h.Database("query-api"))
 
-	s.Every(5).Seconds().Do(func() {
-		fmt.Println("running cron")
-	})
+	// s.Every(5).Seconds().Do(func() {
+	// 	fmt.Println("running cron")
+	// })
 
-	s.StartAsync()
+	// s.StartAsync()
 
 	app.Listen(utils.ParsePort())
 }
