@@ -34,3 +34,4 @@ go.work
 main
 .idea
 *.db
+.docker
