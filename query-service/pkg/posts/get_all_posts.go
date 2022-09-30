@@ -17,7 +17,7 @@ func (h handler) GetAllPosts(c *fiber.Ctx) error {
 		})
 	}
 
-	var result []models.Post
+	var result []models.DBPost
 	if err = cursor.All(c.Context(), &result); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": err.Error(),
@@ -25,7 +25,7 @@ func (h handler) GetAllPosts(c *fiber.Ctx) error {
 	}
 
 	if len(result) == 0 {
-		return c.JSON([]models.Post{})
+		return c.JSON([]models.DBPost{})
 	}
 
 	return c.JSON(result)

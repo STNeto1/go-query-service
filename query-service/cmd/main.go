@@ -32,15 +32,13 @@ func main() {
 		}
 	}()
 
-	s := gocron.NewScheduler(time.UTC)
-
 	app := fiber.New()
 	posts.RegisterRoutes(app, h.Database("query-api"))
 
-	s.Every(5).Seconds().Do(func() {
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(30).Minutes().Do(func() {
 		posts.UpdatePostRegisters(h.Database("query-api"))
 	})
-
 	s.StartAsync()
 
 	app.Listen(utils.ParsePort())
