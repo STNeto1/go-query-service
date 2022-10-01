@@ -23,12 +23,18 @@ func main() {
 		}
 	}
 
+	conn := utils.CreateRmqConnection("amqp://guest:guest@localhost:5672/")
+	ch := utils.CreateRmqChannel(conn)
+	q := utils.CreateRmqQueue(ch, "post")
+	defer conn.Close()
+	defer ch.Close()
+
 	h := db.Connect()
-	var v = validator.New()
+	v := validator.New()
 
 	app := fiber.New()
 
-	post.RegisterRoutes(app, h, v)
+	post.RegisterRoutes(app, h, v, ch, q)
 
 	app.Listen(utils.ParsePort())
 }

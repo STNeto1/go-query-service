@@ -1,9 +1,13 @@
 package post
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
 	"post-api/pkg/common/models"
 
 	"github.com/gofiber/fiber/v2"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type CreatePostRequestBody struct {
@@ -34,6 +38,26 @@ func (h handler) CreatePost(c *fiber.Ctx) error {
 	}
 
 	if err := h.DB.Create(&post).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Something went wrong",
+		})
+	}
+
+	jsonPost, err := json.Marshal(post)
+	if err != nil {
+		fmt.Println(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Something went wrong",
+		})
+	}
+
+	err = h.RmqChannel.PublishWithContext(context.Background(), "", h.Queue.Name, false, false, amqp.Publishing{
+		ContentType: "application/json",
+		Body:        jsonPost,
+	})
+
+	if err != nil {
+		fmt.Println(err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Something went wrong",
 		})

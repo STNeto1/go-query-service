@@ -6,18 +6,23 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"gorm.io/gorm"
 )
 
 type handler struct {
-	DB        *gorm.DB
-	Validator *validator.Validate
+	DB         *gorm.DB
+	Validator  *validator.Validate
+	RmqChannel *amqp.Channel
+	Queue      amqp.Queue
 }
 
-func RegisterRoutes(r *fiber.App, db *gorm.DB, v *validator.Validate) {
+func RegisterRoutes(r *fiber.App, db *gorm.DB, v *validator.Validate, channel *amqp.Channel, queue amqp.Queue) {
 	h := &handler{
-		DB:        db,
-		Validator: v,
+		DB:         db,
+		Validator:  v,
+		RmqChannel: channel,
+		Queue:      queue,
 	}
 
 	routes := r.Group("/posts")
